@@ -66,7 +66,7 @@ const orderSchema = new Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['visa', 'paypal', 'cash', 'stripe']
+        enum: ['cash', 'card']
     },
     updatedBy: {
         type: Schema.Types.ObjectId,

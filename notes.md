@@ -33,6 +33,8 @@
 27. use CORS to allow any one from the front end to connect or if you want to restrict , make a whitelist to control the IPs , domains to connect or to hit the APIs .
 28. modify some things in the package JSON (engines , "start"script , download the nodemon dependency in the project)
 29. git hub upload
+30. order qr code
+31. payment with stripe , `note: don't use a real credit card in the developers mode or the test mode , use a test card from the ones given in the documentation!`
 
 ## TODOS
 
@@ -290,4 +292,9 @@
 - commands for re-uploading (for updates) an existing or uploaded repo :
   1. `git remote add origin repoLink`.
   2. `git branch -M main`.
+  3. `git push -u origin main`
+
+- commands for updating the code uploaded on the repo :
+  1. `git add .`
+  2. `git commit -m "name of the upload (preferred to be the same name of the existing upload)"`
   3. `git push -u origin main`

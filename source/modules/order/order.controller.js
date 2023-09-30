@@ -1,7 +1,8 @@
 import {
     orderModel, couponModel, isCouponValid, productModel, cartModel, createInvoice,
-    mailFunction
+    mailFunction, customAlphabet, qrCodeFunction, stripePayment, generateToken, verifyToken
 } from './order.controller.imports.js'
+const nanoid = customAlphabet('12gds3fh@', 4)
 
 export const createOrder = async (req, res, next) => {
     // this adds a single product to the order .
@@ -68,6 +69,38 @@ export const createOrder = async (req, res, next) => {
     }
     const saveOrder = await orderModel.create(orderObject)
     if (saveOrder) {
+        // payment :
+        let orderSession
+        const token = await generateToken({
+            payload: { orderId: saveOrder._id },
+            signature: process.env.order_secretKey,
+            expiresIn: '1h'
+        })
+        if (saveOrder.paymentMethod == 'card') {
+            orderSession = await stripePayment({
+                payment_method_types: ['card'],
+                mode: 'payment',
+                customer_email: req.authUser.email,
+                metadata: {
+                    orderId: saveOrder._id.toString()
+                },
+                success_url: `${req.protocol}://${req.headers.host}/order/successOrder?token=${token}`,
+                cancel_url: `${req.protocol}://${req.headers.host}/order/cancelOrder?token=${token}`,
+                line_items: saveOrder.products.map((ele) => {
+                    return {
+                        price_data: {
+                            currency: 'EGP',
+                            product_data: {
+                                name: ele.title
+                            },
+                            unit_amount: ele.price * 100
+                        },
+                        quantity: ele.quantity
+                    }
+                })
+            })
+        }
+
         // increase coupon usage count for the user
         if (req.coupon) {
             for (const user of req.coupon?.couponAssignedToUsers) {
@@ -83,7 +116,10 @@ export const createOrder = async (req, res, next) => {
         }, { new: true })
         // remove the product from the cart of the user if it exists
 
-        const orderCode = `${req.authUser.userName}_${nanoid(3)}`
+        // create qrCode : 
+        const orderQrCode = await qrCodeFunction({ data: { orderId: saveOrder._id, products: saveOrder.products, subTotal: saveOrder.subTotal } })
+
+        const orderCode = `${req.authUser.userName}_${nanoid()}`
         // create invoice object data :
         const orderInvoice = {
             shipping: {
@@ -112,7 +148,9 @@ export const createOrder = async (req, res, next) => {
         })
         return res.status(201).json({
             message: "order created!",
-            order: saveOrder
+            order: saveOrder,
+            orderQrCode,
+            chechOutPage: orderSession
         })
     }
     return next(new Error('failed to create order'), { cause: 400 })
