@@ -32,6 +32,7 @@
 26. mongoDB atlas (convert the database into cloud)
 27. use CORS to allow any one from the front end to connect or if you want to restrict , make a whitelist to control the IPs , domains to connect or to hit the APIs .
 28. modify some things in the package JSON (engines , "start"script , download the nodemon dependency in the project)
+29. git hub upload
 
 ## TODOS
 
@@ -265,3 +266,28 @@
 
 - it controles the IPs , domains from the frontend that can hit or connect to your backend APIs .
 - it does that by making a whitelist for the allowed origins (IP or domain) then it checks the origin of the request if it's included in the whitelist or not .
+
+=================================================================
+
+## git hub upload
+
+===================
+
+- steps to upload a github project :
+  1. create a git hub repository .
+  2. get the repository link from the code section
+  3. open the terminal (or the cmd) at the project path
+  4. write the commands below :
+
+- commands for uploading for the first time :
+  1. `git init`
+  2. `git add .`
+  3. `git commit -m "name of the uplad"`.
+  4. `git branch -M main`.
+  5. `git remote add origin repoLink`
+  6. `git push -u origin main`
+
+- commands for re-uploading (for updates) an existing or uploaded repo :
+  1. `git remote add origin repoLink`.
+  2. `git branch -M main`.
+  3. `git push -u origin main`
