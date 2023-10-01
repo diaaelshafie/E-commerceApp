@@ -16,4 +16,13 @@ router.post(
     asyncHandler(orderCont.convertCartToOrder)
 )
 
+router.patch(
+    '/successOrder',
+    asyncHandler(orderCont.successPayment)
+)
+
+router.patch(
+    '/cancelOrder',
+    asyncHandler(orderCont.cancelPayment)
+)
 export default router

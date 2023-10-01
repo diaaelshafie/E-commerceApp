@@ -9,8 +9,10 @@ import { qrCodeFunction } from "../../utilities/qrCode.js"
 import { customAlphabet } from "nanoid"
 import { stripePayment } from "../../utilities/payment.js"
 import { generateToken, verifyToken } from '../../utilities/token/tokenUtils.js'
+import stripe from 'stripe'
 
 export {
     orderModel, couponModel, isCouponValid, productModel, cartModel, createInvoice,
-    mailFunction, qrCodeFunction, customAlphabet, stripePayment, generateToken, verifyToken
+    mailFunction, qrCodeFunction, customAlphabet, stripePayment, generateToken, verifyToken,
+    stripe
 }

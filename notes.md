@@ -35,6 +35,7 @@
 29. git hub upload
 30. order qr code
 31. payment with stripe , `note: don't use a real credit card in the developers mode or the test mode , use a test card from the ones given in the documentation!`
+32. order cancelling and success APIs
 
 ## TODOS
 
