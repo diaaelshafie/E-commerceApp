@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import { customAlphabet } from "nanoid"
 import { mailFunction } from "../../services/mailService.js"
 import { generateToken, verifyToken } from '../../utilities/token/tokenUtils.js'
+import { OAuth2Client } from 'google-auth-library'
 
 export {
     bcrypt,
@@ -12,5 +13,6 @@ export {
     userModel,
     mailFunction,
     generateToken,
-    verifyToken
+    verifyToken,
+    OAuth2Client
 }

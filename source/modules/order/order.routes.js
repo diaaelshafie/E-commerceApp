@@ -22,7 +22,14 @@ router.patch(
 )
 
 router.patch(
+    '/deliverOrder',
+    isAuth(orderAPIroles.deliverOrder),
+    asyncHandler(orderCont.deliverOrder)
+)
+
+router.patch(
     '/cancelOrder',
     asyncHandler(orderCont.cancelPayment)
 )
+
 export default router

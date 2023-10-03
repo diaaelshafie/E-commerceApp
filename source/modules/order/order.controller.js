@@ -44,6 +44,9 @@ export const createOrder = async (req, res, next) => {
     let subTotal = productObject.finalPrice
     let paidAmount = 0
     // req.coupon is returned from the function "isCouponValid"
+    if (req.coupon?.isFixed && req.coupon?.couponAmount > getProduct.priceAfterDiscount) {
+        return next(new Error('please select another product', { cause: 400 }))
+    }
     if (req.coupon?.isPercentage) {
         paidAmount = subTotal * (1 - (req.coupon.couponAmount || 0) / 100)
     }
@@ -326,5 +329,22 @@ export const cancelPayment = async (req, res, next) => {
     res.status(200).json({
         message: "your order is cancelled!",
         cancelledOrder: getOrder
+    })
+}
+
+export const deliverOrder = async (req, res, next) => {
+    const { orderId } = req.query
+    const getOrder = await orderModel.findOneAndUpdate({
+        _id: orderId,
+        orderStatus: { $nin: ['pending', 'delivered', 'rejected', 'cancelled'] }
+    }, {
+        orderStatus: 'delivered'
+    }, { new: true })
+    if (!getOrder) {
+        return next(new Error('invalid order!', { cause: 400 }))
+    }
+    res.status(200).json({
+        message: "done!",
+        order: getOrder
     })
 }

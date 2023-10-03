@@ -24,6 +24,7 @@ export const initiateApp = (app, express) => {
     app.use('/user', Routers.userRouter)
     app.use('/cart', Routers.cartRouter)
     app.use('/order', Routers.orderRouter)
+    app.use('/review', Routers.reviewRouter)
 
     app.use('*', (req, res, next) => {
         res.status(StatusCodes.NOT_FOUND).json({

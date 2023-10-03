@@ -1,5 +1,5 @@
 import {
-    bcrypt, cloudinary, customAlphabet, userModel, mailFunction, generateToken, verifyToken
+    bcrypt, cloudinary, customAlphabet, userModel, mailFunction, generateToken, verifyToken, OAuth2Client
 } from '../user/user.controller.imports.js'
 
 const nanoid = customAlphabet('agd3jklv1487_-$', 5)
@@ -181,5 +181,85 @@ export const resetPassword = async (req, res, next) => {
     res.status(200).json({
         message: "reset password done!",
         user: getUser
+    })
+}
+
+export const loginWithGoogle = async (req, res, next) => {
+    const client = new OAuth2Client()
+    const { idToken } = req.body
+    async function verify() {
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.social_login_clientId,  // Specify the CLIENT_ID of the app that accesses the backend
+            // Or, if multiple clients access the backend:
+            //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+        });
+        const payload = ticket.getPayload();
+        return payload
+    }
+    const { email_verified, email, name } = await verify()
+    if (!email_verified) {
+        return next(new Error('invalid email!', { cause: 400 }))
+    }
+    // if true : either login or sign up
+    const getUser = await userModel.findOne({
+        email,
+        provider: 'Google'
+    })
+    // login :
+    if (getUser) {
+        const token = generateToken({
+            payload: {
+                email,
+                _id: getUser._id,
+                role: getUser.role
+            },
+            signature: process.env.LOGIN_SECRET_KEY,
+            expiresIn: '1d'
+        })
+        if (!token) {
+            return next(new Error('failed to generate user token', { cause: 500 }))
+        }
+
+        const updateUser = await userModel.findOneAndUpdate({ email }, { status: 'online', token }, { new: true })
+        if (!updateUser) {
+            return next(new Error('failed to login the user!', { cause: 500 }))
+        }
+
+        return res.status(200).json({
+            message: "login is successfull!",
+            user: updateUser,
+            token
+        })
+    }
+
+    // sign Up :
+    const userObject = {
+        userName: name,
+        password: nanoid(3),
+        provider: 'Google',
+        isConfirmed: true,
+        phoneNumber: '',
+        Role: 'User',
+    }
+    const saveUser = await userModel.create(userObject)
+    if (!saveUser) {
+        return next(new Error('failed to save the user!', { cause: 500 }))
+    }
+    const token = generateToken({
+        payload: {
+            email: saveUser.email,
+            _id: saveUser._id,
+            role: saveUser.role
+        },
+        signature: process.env.LOGIN_SECRET_KEY,
+        expiresIn: '1d'
+    })
+    saveUser.token = token
+    saveUser.status = 'online'
+    await saveUser.save()
+    res.status(200).json({
+        message: "verified",
+        user: saveUser
     })
 }

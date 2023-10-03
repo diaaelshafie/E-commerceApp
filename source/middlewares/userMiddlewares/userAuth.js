@@ -2,6 +2,7 @@ import { generateToken, verifyToken } from '../../utilities/token/tokenUtils.js'
 import { userModel } from '../../DB/models/user.model.js'
 
 // this contains authentication , authorization
+// note : roles parameter should be an array since we use method .includes() => for arrays only
 export const isAuth = (roles) => {
     return async (req, res, next) => {
         try {

@@ -42,4 +42,9 @@ router.patch(
     asyncHandler(authCont.resetPassword)
 )
 
+router.post(
+    '/loginWithGoogle',
+    asyncHandler(authCont.loginWithGoogle)
+)
+
 export default router

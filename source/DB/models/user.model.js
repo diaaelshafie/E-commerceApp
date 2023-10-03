@@ -42,6 +42,11 @@ const userSchema = new Schema({
         default: 'offline',
         enum: ['offline', 'online']
     },
+    provider: {
+        type: String,
+        default: 'System',
+        enum: ['System', 'Google', 'Facebook']
+    },
     gender: {
         type: String,
         default: 'notSpecified',

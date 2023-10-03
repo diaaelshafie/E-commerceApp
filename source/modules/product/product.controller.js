@@ -325,7 +325,11 @@ export const searchProductsByTitle = async (req, res, next) => {
             { title: { $regex: searchKey, $options: 'i' } },
             { desc: { $regex: searchKey, $options: 'i' } }
         ]
-    }).limit(limit).skip(skip)
+    }).limit(limit).skip(skip).populate([
+        {
+            path: 'Reviews'
+        }
+    ])
     res.status(200).json({
         message: "done!",
         products

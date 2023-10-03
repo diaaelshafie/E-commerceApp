@@ -36,12 +36,15 @@
 30. order qr code
 31. payment with stripe , `note: don't use a real credit card in the developers mode or the test mode , use a test card from the ones given in the documentation!`
 32. order cancelling and success APIs
+33. `social login` -> establish the google cloud account and get the client id from it later .
+34. `google auth library`
 
 ## TODOS
 
 1. continue the user dependent controllers edits .
 2. and test those APIs again after the edits .
-3. find the missing lecture that explains the auto token refresh , the edited user auth .
+3. establish the `google cloud` account to get the `client Id` for `social login`
+4. study `CORS` again
 
 ## to do topics
 
