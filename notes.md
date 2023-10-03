@@ -45,6 +45,7 @@
 2. and test those APIs again after the edits .
 3. establish the `google cloud` account to get the `client Id` for `social login`
 4. study `CORS` again
+5. continue test all the APIs after completing the remaining CRUDS , validation and graphQL , socket.io
 
 ## to do topics
 

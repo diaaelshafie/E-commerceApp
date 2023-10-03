@@ -206,6 +206,7 @@ export const loginWithGoogle = async (req, res, next) => {
         email,
         provider: 'Google'
     })
+
     // login :
     if (getUser) {
         const token = generateToken({
