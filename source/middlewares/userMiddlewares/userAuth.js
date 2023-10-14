@@ -3,14 +3,14 @@ import { userModel } from '../../DB/models/user.model.js'
 
 // this contains authentication , authorization
 // note : roles parameter should be an array since we use method .includes() => for arrays only
-export const isAuth = (roles) => {
+export const isAuth = (roles = []) => {
     return async (req, res, next) => {
         try {
             const { authorization } = req.headers
             if (!authorization) {
                 return next(new Error('token is missing!', { cause: 400 }))
             }
-            if (!authorization.split(' ')[0] == process.env.USER_LOGIN_TOKEN_PREFIX) {
+            if (authorization.split(' ')[0] !== process.env.USER_LOGIN_TOKEN_PREFIX) {
                 return next(new Error('invalid token prefix', { cause: 400 }))
             }
             const splittedToken = authorization.split(' ')[1]
@@ -50,7 +50,7 @@ export const isAuth = (roles) => {
                     const user = await userModel.findOne({
                         token: splittedToken
                     })
-                    // if the token sent is wrong and expired :
+                    // if the token sent is wrong along with being expired :
                     if (!user) {
                         return next(new Error('invalid token', { cause: 400 }))
                     }
@@ -60,11 +60,13 @@ export const isAuth = (roles) => {
                         expiresIn: '1d',
                         payload: {
                             email: user.email,
-                            _id: user._id
+                            _id: user._id,
+                            role: user.role
                         }
                     })
                     user.token = newToken
                     user.save()
+                    req.authUser = user
                     return res.status(200).json({
                         message: "token refreshed!",
                         newToken

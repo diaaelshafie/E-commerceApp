@@ -4,8 +4,6 @@ import {
 
 const nanoid = customAlphabet('1gdsf3hlk2_-#po!', 6)
 
-// TODO : create authentication of the user trying to make category related actions
-
 // create category :
 export const createCategory = async (req, res, next) => {
     const { name } = req.body
@@ -33,7 +31,7 @@ export const createCategory = async (req, res, next) => {
         },
         customId,
         createdBy: _id
-    } // TODO : add the user code here after creating use APIs
+    }
     const category = await categoryModel.create(categoryData)
     if (!category) {
         await cloudinary.uploader.destroy(public_id)
@@ -77,6 +75,7 @@ export const updateCategory = async (req, res, next) => {
         }
     }
     findCategory.updatedBy = _id
+    findCategory.__v++
     await findCategory.save()
     res.json({
         message: "update is done!",
@@ -139,8 +138,10 @@ export const getAllCategoriesWithSubsWithVirtuals = async (req, res, next) => {
 export const deleteCategory = async (req, res, next) => {
     const { _id } = req.authUser
     const { categoryId } = req.query
+    let messages = []
     const getCategory = await categoryModel.findOneAndDelete({ _id: categoryId, createdBy: _id })
     if (!getCategory) {
+        // category either not found or an invalid one !
         return next(new Error("invalid category id!", { cause: 400 }))
     }
     await cloudinary.uploader.destroy(getCategory.image.public_id)
@@ -148,29 +149,28 @@ export const deleteCategory = async (req, res, next) => {
         categoryId
     })
     if (!deleteRelatedSubCategory.deletedCount) {
-        return next(new Error("related sub category delete fail", { cause: 400 }))
+        // if this logic happened , this means that the related sub categories are not found , the category has no related subs
+        messages.push("there are no related subCategories found!")
     }
     const deleteRelatedBrand = await brandModel.deleteMany({
         categoryId
     })
     if (!deleteRelatedBrand.deletedCount) {
-        return next(new Error("related brand delete fail", { cause: 400 }))
+        // if this logic is done , it means that the category has no related brands
+        messages.push("there are no related brands found!")
     }
     const deleteRelatedProducts = await productModel.deleteMany({
         categoryId
     })
     if (!deleteRelatedProducts.deletedCount) {
-        return next(new Error("related products delete fail", { cause: 400 }))
+        messages.push("there are no related products found!")
     }
     // we need to loop on every sub category , brand , product to delete their images and their folders on the media host .
     await cloudinary.api.delete_resources_by_prefix(`${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getCategory.customId}`)
     await cloudinary.api.delete_folder(`${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getCategory.customId}`)
     res.status(200).json({
         message: 'delete is successfull!',
-        categoryDeleted: getCategory
+        categoryDeleted: getCategory,
+        messages
     })
 }
-
-
-
-// body: {name , description , title}

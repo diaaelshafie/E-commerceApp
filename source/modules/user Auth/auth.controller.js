@@ -6,11 +6,14 @@ const nanoid = customAlphabet('agd3jklv1487_-$', 5)
 
 export const signUp = async (req, res, next) => {
     const {
-        userName, email, password, phoneNumber, address, gender, age
+        userName, email, password, confirmPassword, phoneNumber, address, gender, age, role
     } = req.body
     console.log(req.file)
     if (await userModel.findOne({ email })) {
         return next(new Error('email already exists!', { cause: 400 }))
+    }
+    if (password !== confirmPassword) {
+        return next(new Error("passwords don't match!", { cause: 400 }))
     }
     const customId = nanoid()
     let image
@@ -31,7 +34,8 @@ export const signUp = async (req, res, next) => {
         userName, email, password: hashedPassword,
         phoneNumber, address, gender, age,
         customId,
-        profilePicture: image
+        profilePicture: image,
+        role
     }
 
     const saveUser = await userModel.create(userData)
@@ -169,7 +173,9 @@ export const resetPassword = async (req, res, next) => {
     if (!getUser) {
         return next(new Error('failed to find user', { cause: 400 }))
     }
-    if (bcrypt.compare(newPassword, getUser.password)) {
+    const isPassMatch = await bcrypt.compare(newPassword, getUser.password)
+    console.log({ isPassMatch })
+    if (isPassMatch) {
         return next(new Error('enter a different password', { cause: 400 }))
     }
     const hashedNewPassword = bcrypt.hashSync(newPassword, +process.env.reset_password_salt)
@@ -184,6 +190,7 @@ export const resetPassword = async (req, res, next) => {
     })
 }
 
+// TODO : revise social login 
 export const loginWithGoogle = async (req, res, next) => {
     const client = new OAuth2Client()
     const { idToken } = req.body

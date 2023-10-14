@@ -14,6 +14,7 @@ const subCategorySchema = new Schema({
         lowercase: true,
         required: true
     },
+    // the image itself is optional but if you are going to put it , all of it's data are required 
     image: {
         secure_url: {
             type: String,

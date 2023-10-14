@@ -400,6 +400,7 @@ export const filterWithTheRest = async (req, res, next) => {
 }
 
 export const usingApiFeatures = async (req, res, next) => {
+    // create a new object :
     const ApiFeaturesInstance = new ApiFeatures(productModel.find({}), req.query).pagination().filter()
     const products = await ApiFeaturesInstance.mongooseQuery
     res.status(200).json({

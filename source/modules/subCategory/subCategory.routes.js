@@ -6,11 +6,33 @@ import {
 const router = Router({ mergeParams: true })
 
 router.post(
-    '/createSubCategory:categoryId',
+    '/createSubCategory/:categoryId',
     isAuth(subCategoryAPIroles.createSubCategory),
     multerHostFunction(allowedExtensions.image).single('subCategoryImage'),
     validationCoreFunction(subCatVSchemas.createSubCategorySchema),
     asyncHandler(subCatCont.createSubCategory)
+)
+
+router.put(
+    '/updateSubCategory',
+    isAuth(subCategoryAPIroles.updateSubCategory),
+    multerHostFunction(allowedExtensions.image).single('subCategoryImage'),
+    validationCoreFunction(subCatVSchemas.updateSubCategorySchema),
+    asyncHandler(subCatCont.updateSubCategory)
+)
+
+router.delete(
+    '/deleteSubCategory',
+    isAuth(subCategoryAPIroles.deleteSubcategory),
+    validationCoreFunction(subCatVSchemas.deleteSubCategorySchema),
+    asyncHandler(subCatCont.deleteSubCategory)
+)
+
+router.delete(
+    '/deleteSubCategoryWithBrands',
+    isAuth(subCategoryAPIroles.forceDeleteSubCategory),
+    validationCoreFunction(subCatVSchemas.deleteSubCategorySchema),
+    asyncHandler(subCatCont.deleteSubCategoryWithBrands)
 )
 
 router.post(
@@ -24,9 +46,14 @@ router.post(
 )
 
 router.get(
+    '/test:categoryId',
+    asyncHandler(subCatCont.test)
+)
+
+router.get(
     '/getAllSubCategories',
     isAuth(subCategoryAPIroles.getAllSubCategories),
     asyncHandler(subCatCont.getAllSubCategories)
 )
 
-export default router
+export default router 

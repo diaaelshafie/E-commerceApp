@@ -1,12 +1,20 @@
 import joi from 'joi'
+import { generalFields } from '../../middlewares/joiValidation.js'
 
 export const addCategorySchema = {
     body: joi.object({
         name: joi.string()
     }),
     file: joi.object({
-        categoryImage: joi.object().required()
-    }).unknown()
+        fieldname: joi.string().valid('categoryImage'),
+        originalname: joi.string(),
+        encoding: joi.string(),
+        mimetype: joi.string(),
+        destination: joi.string(),
+        filename: joi.string(),
+        path: joi.string(),
+        size: joi.number()
+    }).unknown(true).options({ presence: 'required' })
 }
 
 export const updateCategorySchema = {
@@ -14,6 +22,13 @@ export const updateCategorySchema = {
         name: joi.string().optional()
     }),
     file: joi.object({
-        categoryImage: joi.object().optional()
-    }).options({ allowUnknown: true })
+        fieldname: joi.string().valid('categoryImage'),
+        originalname: joi.string(),
+        encoding: joi.string(),
+        mimetype: joi.string(),
+        destination: joi.string(),
+        filename: joi.string(),
+        path: joi.string(),
+        size: joi.number()
+    }).unknown(true).options({ presence: 'optional' })
 }

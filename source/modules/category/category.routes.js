@@ -7,6 +7,7 @@ import {
 const router = Router()
 
 // merge params : this is the parent router , we put a parameter here and tell this router to use `subCategoryRouter` APIs that have this parameter in common
+// TODO : fix the links and study again the merge params and test it .
 router.use('/:categoryId', subCategoryRouter)
 
 router.post(
@@ -18,7 +19,7 @@ router.post(
 )
 
 router.put(
-    '/updateCategory:categoryId',
+    '/updateCategory/:categoryId',
     isAuth(categoryAPIroles.UPDATECATEGORY),
     multerHostFunction(allowedExtensions.image).single('categoryImage'),
     validationCoreFunction(catValidSchemas.updateCategorySchema),
@@ -42,13 +43,5 @@ router.delete(
     isAuth(categoryAPIroles.DELETECATEGORY),
     asyncHandler(categoryCont.deleteCategory)
 )
-
-// router.post('/getAllCategoriesWithTheirSubs',
-//     (req, res, next) => {
-
-//     },
-//     (req, res, next) => {
-
-//     })
 
 export default router

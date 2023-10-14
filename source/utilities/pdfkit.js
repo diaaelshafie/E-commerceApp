@@ -4,7 +4,7 @@ import fs from 'fs'
 import PDFdocument from 'pdfkit'
 import path from 'path'
 
-function createInvoice(invoice, pathVar) {
+async function createInvoice(invoice, pathVar) {
     let doc = new PDFdocument({ size: 'A4', margin: 50 })
 
     generateHeader(doc)

@@ -187,7 +187,7 @@ export const convertCartToOrder = async (req, res, next) => {
 
     const getCart = await cartModel.findById(cartId)
     if (!getCart || !getCart.products.length) {
-        return next(new Error('please fille your cart first!', { cause: 400 }))
+        return next(new Error('please fill your cart first!', { cause: 400 }))
     }
 
     if (couponCode) {

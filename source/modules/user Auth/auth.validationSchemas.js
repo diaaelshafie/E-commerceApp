@@ -7,6 +7,9 @@ export const signUpSchema = {
         userName: joi.string().required(),
         email: generalFields.email,
         password: joi.string().required(),
+        confirmPassword: joi.string().valid(joi.ref('password')).messages({
+            'string.pattern.base': 'password regex fail'
+        }).required(),
         phoneNumber: joi.string().required(),
         address: joi.array().items(joi.string().required()),
         gender: joi.string().valid('male', 'female', 'notSpecified', '').optional(),

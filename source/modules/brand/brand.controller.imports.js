@@ -4,6 +4,7 @@ import { brandModel } from "../../DB/models/brand.model.js"
 import cloudinary from '../../services/cloudinary.js'
 import slugify from 'slugify'
 import { customAlphabet } from "nanoid"
+import { checkNewBrandData } from "../../middlewares/brandMiddlewares/brandChecks.js"
 
 export {
     categoryModel,
@@ -11,5 +12,6 @@ export {
     brandModel,
     cloudinary,
     slugify,
-    customAlphabet
+    customAlphabet,
+    checkNewBrandData
 }

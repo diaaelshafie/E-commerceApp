@@ -152,9 +152,11 @@
 ### filtering
 
 - you need to make sure that the API will only recieve one field in the request query :
-- the front end sends the data like this in the request (in postman in Query params part) : `fieldName[operator without the '$' sign]            field value` , ex :
+- the front end sends the data like this in the request (in postman in Query params part) :
+`fieldName[operator without the '$' sign]            field value` , ex :
 `in post man : price[gte]    20000` , this translates to in the code : `price: {gte : '20000'}`
-- TODO : how to make the code makes the value of the field into a number
+- TODO [done] : how to make the code makes the value of the field into a number [it automatically translates into number]
+- TODO : how to map mongoose queries in the request ?
 - to apply the concept for ex :
 
 ```js
@@ -248,11 +250,26 @@
     await cloudinary.api.delete_folder(`${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getCategory.customId}`)
   ```
 
-4.ternary operators can be written like this (this got an error) :
+4. ternary operators can be written like this (this got an error) :
 
   ```js
   // this is a ternary operator in the variable definition
   const priceAfterDiscount = (price * (1 - (appliedDiscount || 0 / 100)))
+ ```
+
+5. to make validation on a file :
+
+  ```js
+        file: joi.object({
+          fieldname: joi.string(),
+          originalname: joi.string(),
+          encoding: joi.string(),
+          mimetype: joi.string(),
+          destination: joi.string(),
+          filename: joi.string(),
+          path: joi.string(),
+          size: joi.number()
+      }).unknown(true)
   ```
 
 ===============================================================

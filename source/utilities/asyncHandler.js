@@ -14,6 +14,17 @@ export const asyncHandler = (API) => {
                     await cloudinary.api.delete_resources_by_prefix(req.imagePath)
                     await cloudinary.api.delete_folder(req.imagePath)
                 }
+                if (req.updateSubCatImgPath) {
+                    await cloudinary.api.delete_resources_by_prefix(req.updateSubCatImgPath)
+                }
+                if (req.deleteSubCatImgPath) {
+                    await cloudinary.api.delete_resources_by_prefix(req.deleteSubCatImgPath)
+                    await cloudinary.api.delete_folder(req.deleteSubCatImgPath)
+                }
+                if (req.addBrandLogoPath) {
+                    await cloudinary.api.delete_resources_by_prefix(req.addBrandLogoPath)
+                    await cloudinary.api.delete_folder(req.addBrandLogoPath)
+                }
                 return next(new Error('API failed to run !', { cause: 500 }))
             })
     }
