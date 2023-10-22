@@ -13,4 +13,33 @@ router.post(
     asyncHandler(brandCont.addBrand)
 )
 
+router.get(
+    '/getAllBrands',
+    isAuth(brandAPIroles.getAllBrands),
+    validationCoreFunction(brandvalidSchemas.getAllBrandsValidationSchema),
+    asyncHandler(brandCont.getAllBrands)
+)
+
+router.put(
+    '/updateBrand',
+    isAuth(brandAPIroles.updateBrand),
+    multerHostFunction(allowedExtensions.image).single('brandLogo'),
+    validationCoreFunction(brandvalidSchemas.updateBrandValidationSchema),
+    asyncHandler(brandCont.updateBrand)
+)
+
+router.delete(
+    '/deleteBrand',
+    isAuth(brandAPIroles.deleteBrand),
+    validationCoreFunction(brandvalidSchemas.deleteBrand),
+    asyncHandler(brandCont.deleteBrand)
+)
+
+router.delete(
+    '/forceDeleteBrand',
+    isAuth(brandAPIroles.forceDeleteBrands),
+    validationCoreFunction(brandvalidSchemas.forceDeleteBrand),
+    asyncHandler(brandCont.forceDeleteBrand)
+)
+
 export default router

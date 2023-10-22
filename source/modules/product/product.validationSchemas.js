@@ -17,7 +17,14 @@ export const addProductValidationSchema = {
         brandId: generalFields._id,
     }).presence('required'),
     files: joi.array().items(joi.object({
-        images: joi.object().required()
+        fieldname: joi.string().valid('images'),
+        originalname: joi.string(),
+        encoding: joi.string(),
+        mimetype: joi.string(),
+        destination: joi.string(),
+        filename: joi.string(),
+        path: joi.string(),
+        size: joi.number()
     })).max(3).options({ allowUnknown: true })
     // files: joi.object({
     //     images: joi.array().items(joi.object().unknown(true)).max(3).required()
@@ -41,6 +48,19 @@ export const updateProductValidationSchema = {
         brandId: generalFields._id.optional(),
     }),
     files: joi.array().items(joi.object({
-        images: joi.object().optional()
+        fieldname: joi.string().valid('images'),
+        originalname: joi.string(),
+        encoding: joi.string(),
+        mimetype: joi.string(),
+        destination: joi.string(),
+        filename: joi.string(),
+        path: joi.string(),
+        size: joi.number()
     })).max(3).options({ allowUnknown: true }).optional()
+}
+
+export const deleteProductValidationSchema = {
+    query: joi.object({
+        _id: generalFields._id
+    }).presence('required')
 }

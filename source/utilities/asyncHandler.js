@@ -9,6 +9,7 @@ export const asyncHandler = (API) => {
                     err: err,
                     message: err.message
                 })
+                if (err.error?.message.includes("Can't find folder with path E-commerce App")) { }
                 console.log(req.imagePath)
                 if (req.imagePath) {
                     await cloudinary.api.delete_resources_by_prefix(req.imagePath)

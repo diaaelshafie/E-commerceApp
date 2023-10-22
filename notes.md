@@ -250,14 +250,14 @@
     await cloudinary.api.delete_folder(`${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getCategory.customId}`)
   ```
 
-4. ternary operators can be written like this (this got an error) :
+- ternary operators can be written like this (this got an error) :
 
   ```js
   // this is a ternary operator in the variable definition
   const priceAfterDiscount = (price * (1 - (appliedDiscount || 0 / 100)))
- ```
+  ```
 
-5. to make validation on a file :
+- to make validation on a file :
 
   ```js
         file: joi.object({
@@ -272,6 +272,17 @@
       }).unknown(true)
   ```
 
+- this is the best way to delete a single file untill now :
+
+  ```js
+    await cloudinary.api.delete_all_resources({
+              public_ids: [getbrand.customId]
+          })
+    await cloudinary.api.delete_folder(
+        `${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getCategory.customId}/subCategories/${getSubCategory.customId}/brands/${getbrand.customId}`
+    )
+  ```
+
 ===============================================================
 
 ## PDF kit
@@ -282,7 +293,7 @@
   1. <https://pdfkit.org/>
   2. <https://www.npmjs.com/package/pdfkit>
 
-================================================================
+===============================================================
 
 ## CORS
 
@@ -291,7 +302,7 @@
 - it controles the IPs , domains from the frontend that can hit or connect to your backend APIs .
 - it does that by making a whitelist for the allowed origins (IP or domain) then it checks the origin of the request if it's included in the whitelist or not .
 
-=================================================================
+===============================================================
 
 ## git hub upload
 

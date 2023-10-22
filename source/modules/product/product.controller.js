@@ -9,19 +9,20 @@ const nanoid = customAlphabet('1gdsf3hlk2_-#po!', 6)
 export const addProduct = async (req, res, next) => {
     const { categoryId, subCategoryId, brandId } = req.query
     const { title, desc, colors, sizes, stock, price } = req.body
+    const createdBy = req.authUser._id
     let appliedDiscount = req.body.appliedDiscount
     // TODO : the below code is repeated in alot of APIs , put it in a function or an utility
     const getCategory = await categoryModel.findById(categoryId)
     if (!getCategory) {
-        return next(new Error("the category entered doesn't exists", { cause: 400 }))
+        return next(new Error("the category entered doesn't exist", { cause: 400 }))
     }
     const getSubCategory = await subCategoryModel.findById(subCategoryId)
     if (!getSubCategory) {
-        return next(new Error("the sub category entered doesn't exists", { cause: 400 }))
+        return next(new Error("the sub category entered doesn't exist", { cause: 400 }))
     }
     const getBrand = await brandModel.findById(brandId)
     if (!getBrand) {
-        return next(new Error("the brand entered doesn't exists", { cause: 400 }))
+        return next(new Error("the brand entered doesn't exist", { cause: 400 }))
     }
     const checkCatSubCatRelated = await subCategoryModel.findOne({
         _id: subCategoryId,
@@ -76,9 +77,9 @@ export const addProduct = async (req, res, next) => {
         categoryId, subCategoryId,
         brandId, priceAfterDiscount, customId,
         slug: sluggedTitle,
-        images: images
+        images: images,
+        createdBy
     }
-    // TODO : handle the error that may go to .catch in async handler here .
     const saveProduct = await productModel.create(productData)
     if (!saveProduct) {
         await cloudinary.api.delete_resources(publicIds)
@@ -100,10 +101,14 @@ export const updateProduct = async (req, res, next) => {
     const {
         productId, categoryId, subCategoryId, brandId
     } = req.query
+    const createdBy = req.authUser._id
     if (!productId) {
         return next(new Error('please send a product ID !', { cause: 400 }))
     }
-    const getProduct = await productModel.findById(productId)
+    const getProduct = await productModel.findOne({
+        _id: productId,
+        createdBy
+    })
     if (!getProduct) {
         return next(new Error('invalid product ID !', { cause: 400 }))
     }
@@ -150,7 +155,7 @@ export const updateProduct = async (req, res, next) => {
     //     return next(new Error('categories are not related !', { cause: 400 }))
     // }
     if (title) {
-        if (getProduct.title === title.toLowerCase()) {
+        if (getProduct.title.toLowerCase() === title.toLowerCase()) {
             return next(new Error('enter a different product title , duplicates !', { cause: 400 }))
         }
         getProduct.title = title
@@ -172,9 +177,7 @@ export const updateProduct = async (req, res, next) => {
         // this inserts the new colors in the data base direclty
         else {
             for (const color of colors) {
-                if (getProduct.colors.includes(color)) {
-                    return next(new Error(`the ${color} color already exists , duplicates`, { cause: 400 }))
-                }
+                if (getProduct.colors.includes(color)) { continue }
                 getProduct.colors.push(color)
             }
         }
@@ -187,9 +190,7 @@ export const updateProduct = async (req, res, next) => {
         // this inserts the new sizes in the data base direclty
         else {
             for (const size of sizes) {
-                if (getProduct.sizes.includes(size)) {
-                    return next(new Error(`the ${size} color already exists , duplicates`, { cause: 400 }))
-                }
+                if (getProduct.sizes.includes(size)) { continue }
                 getProduct.sizes.push(size)
             }
         }
@@ -308,7 +309,17 @@ export const updateProduct = async (req, res, next) => {
 export const getAllProducts = async (req, res, next) => {
     const { page, size } = req.body
     const { limit, skip } = paginationFunction({ page, size })
-    const products = await productModel.find().limit(limit).skip(skip)
+    let products
+    if (req.authUser.role === 'Admin') {
+        products = await productModel.find().limit(limit).skip(skip)
+    } else {
+        products = await productModel.find({
+            createdBy: req.authUser._id
+        }).limit(limit).skip(skip)
+    }
+    if (!products) {
+        return next(new Error("couldn't get the documents from data base!", { cause: 500 }))
+    }
     res.status(200).json({
         message: "done!",
         products
@@ -409,4 +420,59 @@ export const usingApiFeatures = async (req, res, next) => {
     })
 }
 
-// TODO : delete products 
+export const deleteProduct = async (req, res, next) => {
+    const createdBy = req.authUser._id
+    const { _id } = req.query
+    const getProduct = await productModel.findOne({
+        _id,
+        createdBy
+    }).populate([
+        {
+            path: 'Brands'
+        },
+        {
+            path: 'SubCategory'
+        },
+        {
+            path: 'Category'
+        }
+    ])
+    if (!getProduct) {
+        return next(new Error("invalid product Id!", { cause: 400 }))
+    }
+    console.log(getProduct)
+    const getBrand = await brandModel.findById(getProduct.brandId)
+    if (!getBrand) {
+        return next(new Error("invalid brand Id!", { cause: 400 }))
+    }
+    const getSubCategory = await subCategoryModel.findById(getProduct.subCategoryId)
+    if (!getSubCategory) {
+        return next(new Error("invalid sub category Id!", { cause: 400 }))
+    }
+    const getCategory = await categoryModel.findById(getProduct.categoryId)
+    if (!getCategory) {
+        return next(new Error("invalid category Id!", { cause: 400 }))
+    }
+    // delete images from the cloud then the database
+    let imagesPublicIds = []
+    for (const image of getProduct.images) {
+        imagesPublicIds.push(image.public_id)
+    }
+    await cloudinary.api.delete_resources(imagesPublicIds)
+    await cloudinary.api.delete_folder(
+        `${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getCategory.customId}/subCategories/${getSubCategory.customId}/brands/${getBrand.customId}/products/${getProduct.customId}`
+    )
+    req.imagesPublicIds = imagesPublicIds
+    req.productCloudPath = `${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getCategory.customId}/subCategories/${getSubCategory.customId}/brands/${getBrand.customId}/products/${getProduct.customId}`
+    const deleteProduct = await productModel.deleteOne({
+        _id,
+        createdBy
+    })
+    if (!deleteProduct) {
+        return next(new Error("couldn't delete the product from data base", { cause: 500 }))
+    }
+    res.status(200).json({
+        message: "delete is done!",
+
+    })
+}

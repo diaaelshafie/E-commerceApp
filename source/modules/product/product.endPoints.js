@@ -7,5 +7,6 @@ export const productAPIroles = {
     searchProductsByTitile: [systemRoles.ADMIN, systemRoles.SUPERADMIN, systemRoles.USER],
     listProducts: [systemRoles.ADMIN, systemRoles.SUPERADMIN, systemRoles.USER],
     filterProducts: [systemRoles.ADMIN, systemRoles.SUPERADMIN, systemRoles.USER],
-    apiFeatures: [systemRoles.ADMIN, systemRoles.SUPERADMIN, systemRoles.USER]
+    apiFeatures: [systemRoles.ADMIN, systemRoles.SUPERADMIN, systemRoles.USER],
+    deleteProducts: [systemRoles.ADMIN, systemRoles.SUPERADMIN]
 }

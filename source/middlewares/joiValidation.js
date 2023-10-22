@@ -14,7 +14,8 @@ export const generalFields = {
             'string.pattern.base': 'password regex fail'
         }).required(),
     _id: joi.string().custom(validationObjectId),
-    jwtToken: joi.string().pattern(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
+    jwtToken: joi.string().pattern(/^[A-Za-z0-9-_]+ [A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
+    // joi.string().pattern(/^[A-Za-z0-9-_]\[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/)
 }
 
 export const validationCoreFunction = (schema) => { // updateProductValidationSchema

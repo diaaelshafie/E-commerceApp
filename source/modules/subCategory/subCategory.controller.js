@@ -196,6 +196,10 @@ export const deleteSubCategoryWithBrands = async (req, res, next) => {
     if (!getSubCategory) {
         return next(new Error("didn't find such subCategory!", { cause: 400 }))
     }
+    const getCategory = await categoryModel.findById(getSubCategory.categoryId)
+    if (!getCategory) {
+        return next(new Error("couldn't find the category!", { cause: 400 }))
+    }
     const brands = await brandModel.find({ subCategoryId: getSubCategory._id })
     const deletedBrands = []
     const notDeletedBrandsIds = []
@@ -204,12 +208,15 @@ export const deleteSubCategoryWithBrands = async (req, res, next) => {
         // deletion of brands will be in both cloudinary and data base
         for (const brand of brands) {
             // we need to store the public_id of the brand in a variable in case it got deleted
+            await cloudinary.api.delete_resources(brandpublicId).catch((err) => {
+                notDeletedLogos.push(brandpublicId)
+            })
+            await cloudinary.api.delete_folder(
+                `${process.env.PROJECT_UPLOADS_FOLDER}/categories/${getRelatedCategory.customId}/subCategories/${getSubCat.customId}`
+            )
             const brandpublicId = brand.logo.public_id
             if (!deletedBrands.push(await brandModel.deleteOne({ _id: brand._id }))) {
                 notDeletedBrandsIds.push(brand._id)
-            }
-            if (!await cloudinary.api.delete_resources(brandpublicId)) {
-                notDeletedLogos.push(brandpublicId)
             }
         }
     }

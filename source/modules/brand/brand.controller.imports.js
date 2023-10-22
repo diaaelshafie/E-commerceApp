@@ -5,6 +5,8 @@ import cloudinary from '../../services/cloudinary.js'
 import slugify from 'slugify'
 import { customAlphabet } from "nanoid"
 import { checkNewBrandData } from "../../middlewares/brandMiddlewares/brandChecks.js"
+import { paginationFunction } from '../../utilities/pagination.js'
+import { productModel } from '../../DB/models/product.model.js'
 
 export {
     categoryModel,
@@ -13,5 +15,7 @@ export {
     cloudinary,
     slugify,
     customAlphabet,
-    checkNewBrandData
+    checkNewBrandData,
+    paginationFunction,
+    productModel
 }

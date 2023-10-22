@@ -53,4 +53,11 @@ router.get(
     asyncHandler(productCont.usingApiFeatures)
 )
 
+router.delete(
+    '/deleteProduct',
+    isAuth(productAPIroles.deleteProducts),
+    validationCoreFunction(productValidSchemas.deleteProductValidationSchema),
+    asyncHandler(productCont.deleteProduct)
+)
+
 export default router 
